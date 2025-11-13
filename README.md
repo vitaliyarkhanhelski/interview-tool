@@ -1,6 +1,6 @@
 # 🎤 AI Interview Practice Tool
 
-Perfect your interview skills with an AI-powered HR interviewer! Get personalized interview questions and receive detailed feedback on your performance - all powered by GPT-4o.
+Perfect your interview skills with an AI-powered HR interviewer! Get personalized interview questions and receive detailed feedback on your performance - all powered by Google Gemini 2.5 Flash.
 
 ## ✨ What Can You Do?
 

@@ -1,5 +1,4 @@
-from openai import OpenAI
-import time
+from google import genai
 
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
@@ -69,10 +68,10 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
         """
     )
 
-    client = OpenAI(api_key=st.secrets["OPEN_API_KEY"])
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-    if "openai_model" not in st.session_state:
-        st.session_state.openai_model = "gpt-4o"
+    if "gemini_model" not in st.session_state:
+        st.session_state.gemini_model = "gemini-2.5-flash"
 
     if not st.session_state.messages:
         # System message
@@ -87,28 +86,52 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
             with st.chat_message(message["role"], avatar=avatar):
                 st.markdown(message["content"])
 
-    if st.session_state.user_message_count < 3:
+
+    if st.session_state.user_message_count < 5:
         if prompt := st.chat_input("Your answer:", max_chars=1000):
             st.session_state.messages.append({"role": "user", "content": prompt})
 
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            if st.session_state.user_message_count < 2:
+            if st.session_state.user_message_count < 4:
                 with st.chat_message("assistant", avatar="👔"):
-                    stream = client.chat.completions.create(
-                        model=st.session_state.openai_model,
-                        messages=[
-                            {"role": m["role"], "content": m["content"]} for m in st.session_state.messages
-                        ],
-                        stream=True
-                    )
-                    response = st.write_stream(stream)
-                st.session_state.messages.append({"role": "assistant", "content": response})
+                    try:
+                        # Get system instruction
+                        system_instruction = next((m["content"] for m in st.session_state.messages if m["role"] == "system"), "")
+                        
+                        # Build conversation history
+                        conversation = "\n".join([
+                            f"{'User' if m['role'] == 'user' else 'Assistant'}: {m['content']}"
+                            for m in st.session_state.messages if m["role"] != "system"
+                        ])
+                        
+                        # Create full prompt with system instruction
+                        full_prompt = f"{system_instruction}\n\nConversation:\n{conversation}"
+                        
+                        # Call Gemini API
+                        response = client.models.generate_content(
+                            model=st.session_state.gemini_model,
+                            contents=full_prompt
+                        )
+                        
+                        full_response = response.text
+                        st.markdown(full_response)
+                        
+                        st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    except Exception as e:
+                        error_message = str(e)
+                        if "503" in error_message or "overloaded" in error_message.lower():
+                            st.error("🔄 **The AI is temporarily busy.** Please wait a moment and try sending your message again.")
+                        else:
+                            st.error(f"❌ **Error:** {error_message}")
+                        # Don't increment counter if there was an error
+                        st.session_state.user_message_count -= 1
+                        st.session_state.messages.pop()  # Remove the user message that failed
             
             st.session_state.user_message_count += 1
     
-    if st.session_state.user_message_count >= 3:
+    if st.session_state.user_message_count >= 5:
         st.session_state.chat_complete = True
 
 if st.session_state.chat_complete and not st.session_state.feedback_shown:
@@ -120,23 +143,36 @@ if st.session_state.feedback_shown:
     
     conversation_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages])
     
-    feedback_client = OpenAI(api_key=st.secrets["OPEN_API_KEY"])
+    try:
+        feedback_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+        
+        system_instruction = """You are a helpful tool that provides feedback on an interviewee performance.
+        Before the Feedback give a score of 1 to 10.
+        Follow this format:
+        Overal Score: //Your score
+        Feedback: //Here you put your feedback
+        Give only the feedback do not ask any additional questins.
+        """
+        
+        feedback_prompt = f"{system_instruction}\n\nThis is the interview you need to evaluate. Keep in mind that you are only a tool and you should not engage to conversation. And you should provide feedback on the interviewee performance. Here is the conversation:\n\n{conversation_history}"
+        
+        with st.spinner("Generating your feedback..."):
+            feedback_response = feedback_client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=feedback_prompt
+            )
+        
+        st.write(feedback_response.text)
     
-    feedback_completion = feedback_client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": """You are a helpful tool that provides feedback on an interviewee performance.
-            Before the Feedback give a score of 1 to 10.
-            Follow this format:
-            Overal Score: //Your score
-            Feedback: //Here you put your feedback
-            Give only the feedback do not ask any additional questins.
-            """},
-            {"role": "user", "content": f"This is the interview you need to evaluate. Keep in mind that you are only a tool and you should not engage to conversation. And you should provide feedback on the interviewee performance. Here is the conversation: {conversation_history}"}
-        ]
-    )
-    
-    st.write(feedback_completion.choices[0].message.content)
+    except Exception as e:
+        error_message = str(e)
+        if "503" in error_message or "overloaded" in error_message.lower():
+            st.error("🔄 **The AI service is currently busy.** Please wait a moment and click the button below to try again.")
+            if st.button("🔄 Retry Feedback", type="secondary"):
+                st.rerun()
+        else:
+            st.error(f"❌ **An error occurred:** {error_message}")
+            st.info("Please try again or restart the interview.")
 
     if st.button("Restart Interview", type="primary"):
         streamlit_js_eval(js_expressions="parent.window.location.reload()")
