@@ -8,6 +8,7 @@ Perfect your interview skills with an AI-powered HR interviewer! Get personalize
 - 💼 **Choose Your Role** - Data Scientist, Data Engineer, ML Engineer, BI Analyst, or Financial Analyst
 - 🏢 **Pick Your Company** - Amazon, Meta, Udemy, LinkedIn, Spotify, and more
 - 🤖 **Talk to an AI Interviewer** - Get realistic interview questions based on your background
+- ⚡ **Real-Time Streaming Responses** - Watch AI responses appear word-by-word like ChatGPT
 - 📊 **Get Scored & Reviewed** - Receive a score out of 10 plus detailed feedback
 - 🔄 **Practice Unlimited Times** - Keep practicing until you nail it!
 
@@ -28,17 +29,22 @@ conda activate streamlit-env
 
 ### Step 3: Install Dependencies
 ```bash
-pip install streamlit openai streamlit-js-eval
+pip install -r requirements.txt
 ```
 
-### Step 4: Add Your OpenAI API Key
-You'll need an OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+Or install manually:
+```bash
+pip install streamlit google-genai streamlit-js-eval
+```
+
+### Step 4: Add Your Google Gemini API Key
+You'll need a Google Gemini API key ([Get one for free here](https://aistudio.google.com/app/apikey))
 
 1. Create a `.streamlit` folder in the project
 2. Inside `.streamlit`, create a file called `secrets.toml`
 3. Add this line (replace with your actual key):
    ```toml
-   OPEN_API_KEY = "sk-your-actual-api-key-here"
+   GEMINI_API_KEY = "your-gemini-api-key-here"
    ```
 
 **Important:** Don't share or commit this file! It's already in `.gitignore` to keep it safe.
@@ -66,7 +72,8 @@ Your browser will open automatically at `http://localhost:8501`
 
 **3. Start the Interview 🎤**
    - Click "Start Interview"
-   - You'll have 3 questions to answer
+   - You'll have 5 questions to answer
+   - Watch the AI's responses stream in real-time
    - Just type your responses naturally
 
 **4. Get Your Feedback 📊**
@@ -81,16 +88,18 @@ Your browser will open automatically at `http://localhost:8501`
 ## 📦 What You Need
 
 - Python 3.10 or higher
-- An OpenAI API key ([sign up for free credits](https://platform.openai.com/signup))
-- Internet connection (to connect to OpenAI's API)
+- A Google Gemini API key ([get one for free](https://aistudio.google.com/app/apikey))
+- Internet connection (to connect to Google's Gemini API)
 
-That's it! Everything else installs automatically with pip.
+That's it! Everything else installs automatically with `pip install -r requirements.txt`.
 
 ## 📁 Project Structure
 
 ```
 interview-tool/
 ├── app.py                    # The main app
+├── prompts.py                # System prompts and instructions
+├── requirements.txt          # Python dependencies
 ├── .streamlit/
 │   └── secrets.toml         # Your API key (never shared!)
 ├── .gitignore               # Keeps secrets safe
