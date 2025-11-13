@@ -2,6 +2,7 @@ from google import genai
 
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
+from prompts import get_interview_system_prompt, get_feedback_system_prompt
 
 st.set_page_config(page_title="Streamlit Chat", page_icon="💬")
 st.title("Chatbot")
@@ -77,7 +78,7 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
         # System message
         st.session_state.messages = [{
             "role": "system",
-            "content": f"You are an HR executive that interviews an interviewee called {st.session_state['name']} with experience {st.session_state['experience']} and skills {st.session_state['skills']}. You should interview them for the position {st.session_state['level']} {st.session_state['position']} at the company {st.session_state['company']}."
+            "content": get_interview_system_prompt()
         }]
 
     for message in st.session_state.messages:
@@ -109,14 +110,19 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
                         # Create full prompt with system instruction
                         full_prompt = f"{system_instruction}\n\nConversation:\n{conversation}"
                         
-                        # Call Gemini API
-                        response = client.models.generate_content(
+                        # Call Gemini API with streaming
+                        response = client.models.generate_content_stream(
                             model=st.session_state.gemini_model,
                             contents=full_prompt
                         )
                         
-                        full_response = response.text
-                        st.markdown(full_response)
+                        # Stream the response
+                        full_response = ""
+                        response_placeholder = st.empty()
+                        for chunk in response:
+                            if chunk.text:
+                                full_response += chunk.text
+                                response_placeholder.markdown(full_response)
                         
                         st.session_state.messages.append({"role": "assistant", "content": full_response})
                     except Exception as e:
@@ -146,23 +152,23 @@ if st.session_state.feedback_shown:
     try:
         feedback_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
         
-        system_instruction = """You are a helpful tool that provides feedback on an interviewee performance.
-        Before the Feedback give a score of 1 to 10.
-        Follow this format:
-        Overal Score: //Your score
-        Feedback: //Here you put your feedback
-        Give only the feedback do not ask any additional questins.
-        """
+        system_instruction = get_feedback_system_prompt()
         
         feedback_prompt = f"{system_instruction}\n\nThis is the interview you need to evaluate. Keep in mind that you are only a tool and you should not engage to conversation. And you should provide feedback on the interviewee performance. Here is the conversation:\n\n{conversation_history}"
         
         with st.spinner("Generating your feedback..."):
-            feedback_response = feedback_client.models.generate_content(
+            feedback_response = feedback_client.models.generate_content_stream(
                 model="gemini-2.5-flash",
                 contents=feedback_prompt
             )
         
-        st.write(feedback_response.text)
+            # Stream the feedback
+            full_feedback = ""
+            feedback_placeholder = st.empty()
+            for chunk in feedback_response:
+                if chunk.text:
+                    full_feedback += chunk.text
+                    feedback_placeholder.markdown(full_feedback)
     
     except Exception as e:
         error_message = str(e)
