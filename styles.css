@@ -1,0 +1,104 @@
+/* Salesforce Interview Practice - Custom Styles */
+
+/* ============================================================================
+   SALESFORCE COLOR PALETTE
+   ============================================================================ */
+:root {
+    --salesforce-blue: #00A1E0;
+    --salesforce-dark-blue: #032d60;
+    --salesforce-light-blue: #E3F3FF;
+}
+
+/* ============================================================================
+   MAIN BACKGROUND
+   ============================================================================ */
+.stApp {
+    background: linear-gradient(135deg, #E3F3FF 0%, #ffffff 100%);
+}
+
+/* ============================================================================
+   HEADER STYLING
+   ============================================================================ */
+h1 {
+    color: #032d60 !important;
+    font-weight: 700 !important;
+}
+
+/* Subheaders */
+h2, h3 {
+    color: #00A1E0 !important;
+}
+
+/* ============================================================================
+   DIVIDERS
+   ============================================================================ */
+hr {
+    border: none !important;
+    border-top: 2px solid #00A1E0 !important;
+    margin: 1rem 0 !important;
+    opacity: 1 !important;
+}
+
+/* ============================================================================
+   BUTTON STYLING
+   ============================================================================ */
+.stButton > button {
+    background-color: #00A1E0 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button:hover {
+    background-color: #032d60 !important;
+    box-shadow: 0 4px 8px rgba(0, 161, 224, 0.3) !important;
+}
+
+/* ============================================================================
+   INPUT FIELDS
+   ============================================================================ */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+    border: 2px solid #00A1E0 !important;
+    border-radius: 4px !important;
+    background-color: white !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border: 2px solid #032d60 !important;
+    box-shadow: 0 0 0 2px rgba(0, 161, 224, 0.2) !important;
+    outline: none !important;
+}
+
+/* ============================================================================
+   SELECTBOX
+   ============================================================================ */
+.stSelectbox > div > div {
+    border-color: #00A1E0 !important;
+}
+
+/* ============================================================================
+   CHAT MESSAGES
+   ============================================================================ */
+.stChatMessage {
+    background-color: rgba(227, 243, 255, 0.3) !important;
+    border-left: 3px solid #00A1E0 !important;
+    border-radius: 8px !important;
+}
+
+/* ============================================================================
+   INFO BOX
+   ============================================================================ */
+.stInfo {
+    background-color: white !important;
+    border-left: 4px solid #00A1E0 !important;
+    border-radius: 4px !important;
+}
+
+.stInfo, .stInfo > div, .stInfo p, .stInfo span {
+    color: #032d60 !important;
+}
+

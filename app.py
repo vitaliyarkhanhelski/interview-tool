@@ -2,10 +2,20 @@ from google import genai
 
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
-from prompts import get_interview_system_prompt, get_feedback_system_prompt
+from prompts import get_interview_system_prompt, build_feedback_prompt
+from constants import *
+from ui_components import info_box, info_box_small, feedback_box
 
-st.set_page_config(page_title="Streamlit Chat", page_icon="💬")
-st.title("Chatbot")
+st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
+
+# Load custom CSS
+def load_css():
+    with open("styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css()
+
+st.title(MAIN_TITLE)
 
 if "setup_complete" not in st.session_state:
     st.session_state.setup_complete = False
@@ -25,7 +35,7 @@ def show_feedback():
     st.session_state.feedback_shown = True
 
 if not st.session_state.setup_complete:
-    st.subheader("Personal Information", divider="rainbow")
+    st.subheader(SECTION_PERSONAL_INFO, divider=True)
     
     if "name" not in st.session_state:
         st.session_state["name"] = ""
@@ -34,45 +44,36 @@ if not st.session_state.setup_complete:
     if "skills" not in st.session_state:
         st.session_state["skills"] = ""
 
-    st.session_state["name"] = st.text_input(label="Name", placeholder="Enter your name", max_chars=40, value=st.session_state["name"])
-    st.session_state["experience"] = st.text_area(label="Experience", value=st.session_state["experience"], placeholder="Describe your experience", max_chars=200, height=None)
-    st.session_state["skills"] = st.text_area(label="Skills", value=st.session_state["skills"], placeholder="List your skills", max_chars=200, height=None)
+    st.session_state["name"] = st.text_input(label=LABEL_NAME, placeholder=PLACEHOLDER_NAME, max_chars=MAX_CHARS_NAME, value=st.session_state["name"])
+    st.session_state["experience"] = st.text_area(label=LABEL_EXPERIENCE, value=st.session_state["experience"], placeholder=PLACEHOLDER_EXPERIENCE, max_chars=MAX_CHARS_EXPERIENCE, height=None)
+    st.session_state["skills"] = st.text_area(label=LABEL_SKILLS, value=st.session_state["skills"], placeholder=PLACEHOLDER_SKILLS, max_chars=MAX_CHARS_SKILLS, height=None)
 
-    st.subheader("Company and Position", divider="rainbow")
+    st.subheader(SECTION_COMPANY_POSITION, divider=True)
     
-    if "level" not in st.session_state:
-        st.session_state["level"] = "Junior"
     if "position" not in st.session_state:
-        st.session_state["position"] = "Data Scientist"
+        st.session_state["position"] = DEFAULT_POSITION
     if "company" not in st.session_state:
-        st.session_state["company"] = "Amazon"
+        st.session_state["company"] = DEFAULT_COMPANY
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.session_state["level"] = st.radio("Choose Level", key="visibility", options=["Junior", "Mid-Level", "Senior"])
-
+        st.session_state["position"] = st.selectbox(LABEL_POSITION, JOB_POSITIONS)
 
     with col2:
-        st.session_state["position"] = st.selectbox("Choose a Position", ("Data Scientist", "Data Engineer", "ML Engineer", "BI Analyst", "Financial Analyst"))
+        st.session_state["company"] = st.selectbox(LABEL_COMPANY, COMPANIES)
 
-    st.session_state["company"] = st.selectbox("Choose a Company", ("Amazon", "Meta", "Udemy", "365 Company", "Nestle", "LinkedIn", "Spotify"))
-
-    if st.button("Start Interview", on_click=complete_setup):
-        st.write("Setup complete. Starting interview...")
+    if st.button(BUTTON_START_INTERVIEW, on_click=complete_setup):
+        st.write(MESSAGE_SETUP_COMPLETE)
 
 
 if st.session_state.setup_complete and not st.session_state.feedback_shown and not st.session_state.chat_complete:
-    st.info(
-        """
-        Start by introducing yourself
-        """
-    )
+    st.markdown(info_box(MESSAGE_INTRO), unsafe_allow_html=True)
 
     client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
     if "gemini_model" not in st.session_state:
-        st.session_state.gemini_model = "gemini-2.5-flash"
+        st.session_state.gemini_model = GEMINI_MODEL
 
     if not st.session_state.messages:
         # System message
@@ -83,20 +84,20 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
 
     for message in st.session_state.messages:
         if message["role"] != "system":
-            avatar = "👔" if message["role"] == "assistant" else None
+            avatar = AVATAR_INTERVIEWER if message["role"] == "assistant" else None
             with st.chat_message(message["role"], avatar=avatar):
                 st.markdown(message["content"])
 
 
-    if st.session_state.user_message_count < 5:
-        if prompt := st.chat_input("Your answer:", max_chars=1000):
+    if st.session_state.user_message_count < MAX_QUESTIONS:
+        if prompt := st.chat_input(PLACEHOLDER_CHAT_INPUT, max_chars=CHAT_INPUT_MAX_CHARS):
             st.session_state.messages.append({"role": "user", "content": prompt})
 
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            if st.session_state.user_message_count < 4:
-                with st.chat_message("assistant", avatar="👔"):
+            if st.session_state.user_message_count < MAX_QUESTIONS - 1:
+                with st.chat_message("assistant", avatar=AVATAR_INTERVIEWER):
                     try:
                         # Get system instruction
                         system_instruction = next((m["content"] for m in st.session_state.messages if m["role"] == "system"), "")
@@ -128,37 +129,33 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
                     except Exception as e:
                         error_message = str(e)
                         if "503" in error_message or "overloaded" in error_message.lower():
-                            st.error("🔄 **The AI is temporarily busy.** Please wait a moment and try sending your message again.")
+                            st.error(ERROR_AI_BUSY)
                         else:
-                            st.error(f"❌ **Error:** {error_message}")
+                            st.error(f"{ERROR_GENERIC} {error_message}")
                         # Don't increment counter if there was an error
                         st.session_state.user_message_count -= 1
                         st.session_state.messages.pop()  # Remove the user message that failed
             
             st.session_state.user_message_count += 1
     
-    if st.session_state.user_message_count >= 5:
+    if st.session_state.user_message_count >= MAX_QUESTIONS:
         st.session_state.chat_complete = True
 
 if st.session_state.chat_complete and not st.session_state.feedback_shown:
-    if st.button("Get Feedback", on_click=show_feedback):
-        st.write("Fetching feedback...")
+    if st.button(BUTTON_GET_FEEDBACK, on_click=show_feedback):
+        st.write(MESSAGE_FETCHING_FEEDBACK)
 
 if st.session_state.feedback_shown:
-    st.subheader("Feedback")
-    
-    conversation_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages])
+    st.subheader(SECTION_FEEDBACK)
     
     try:
         feedback_client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
         
-        system_instruction = get_feedback_system_prompt()
+        feedback_prompt = build_feedback_prompt(st.session_state.messages)
         
-        feedback_prompt = f"{system_instruction}\n\nThis is the interview you need to evaluate. Keep in mind that you are only a tool and you should not engage to conversation. And you should provide feedback on the interviewee performance. Here is the conversation:\n\n{conversation_history}"
-        
-        with st.spinner("Generating your feedback..."):
+        with st.spinner(MESSAGE_GENERATING_FEEDBACK):
             feedback_response = feedback_client.models.generate_content_stream(
-                model="gemini-2.5-flash",
+                model=GEMINI_MODEL,
                 contents=feedback_prompt
             )
         
@@ -168,17 +165,19 @@ if st.session_state.feedback_shown:
             for chunk in feedback_response:
                 if chunk.text:
                     full_feedback += chunk.text
-                    feedback_placeholder.markdown(full_feedback)
+                    # Wrap feedback in a styled box
+                    feedback_placeholder.markdown(feedback_box(full_feedback), unsafe_allow_html=True)
     
     except Exception as e:
         error_message = str(e)
         if "503" in error_message or "overloaded" in error_message.lower():
-            st.error("🔄 **The AI service is currently busy.** Please wait a moment and click the button below to try again.")
-            if st.button("🔄 Retry Feedback", type="secondary"):
+            st.error(ERROR_AI_FEEDBACK_BUSY)
+            if st.button(BUTTON_RETRY_FEEDBACK, type="secondary"):
                 st.rerun()
         else:
-            st.error(f"❌ **An error occurred:** {error_message}")
-            st.info("Please try again or restart the interview.")
-
-    if st.button("Restart Interview", type="primary"):
+            st.error(f"{ERROR_OCCURRED} {error_message}")
+            st.markdown(info_box_small(INFO_RETRY), unsafe_allow_html=True)
+    
+    st.write("")  # Add spacing
+    if st.button(BUTTON_RESTART_INTERVIEW, type="primary"):
         streamlit_js_eval(js_expressions="parent.window.location.reload()")

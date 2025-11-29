@@ -1,12 +1,12 @@
-# 🎤 AI Interview Practice Tool
+# ☁️ Salesforce Interview Practice Tool
 
-Perfect your interview skills with an AI-powered HR interviewer! Get personalized interview questions and receive detailed feedback on your performance - all powered by Google Gemini 2.5 Flash.
+Perfect your Salesforce interview skills with an AI-powered HR interviewer! Get personalized interview questions and receive detailed feedback on your performance - all powered by Google Gemini 2.5 Flash.
 
 ## ✨ What Can You Do?
 
-- 🎯 **Practice Real Interviews** - Simulate interviews for your dream job
-- 💼 **Choose Your Role** - Data Scientist, Data Engineer, ML Engineer, BI Analyst, or Financial Analyst
-- 🏢 **Pick Your Company** - Amazon, Meta, Udemy, LinkedIn, Spotify, and more
+- 🎯 **Practice Real Salesforce Interviews** - Simulate interviews for your dream Salesforce job
+- 💼 **Choose Your Role** - Developer, Architect, Business Analyst, QA Engineer, Admin, Consultant, and more
+- 🏢 **Pick Your Company** - Salesforce, Deloitte, Accenture, PwC, Capgemini, and leading Salesforce partners
 - 🤖 **Talk to an AI Interviewer** - Get realistic interview questions based on your background
 - ⚡ **Real-Time Streaming Responses** - Watch AI responses appear word-by-word like ChatGPT
 - 📊 **Get Scored & Reviewed** - Receive a score out of 10 plus detailed feedback
@@ -16,8 +16,8 @@ Perfect your interview skills with an AI-powered HR interviewer! Get personalize
 
 ### Step 1: Get the Code
 ```bash
-git clone https://github.com/vitaliyarkhanhelski/interview-tool.git
-cd interview-tool
+git clone https://github.com/vitaliyarkhanhelski/salesforce-interview-tool.git
+cd salesforce-interview-tool
 ```
 
 ### Step 2: Set Up Python Environment
@@ -66,9 +66,8 @@ Your browser will open automatically at `http://localhost:8501`
    - Your skills (what you're good at)
    
 **2. Pick Your Dream Job 🎯**
-   - Choose your level: Junior, Mid-Level, or Senior
-   - Select a position (Data Scientist, Engineer, Analyst, etc.)
-   - Pick your target company (Amazon, Meta, LinkedIn, etc.)
+   - Select a position with the appropriate level (Junior/Mid/Senior Developer, Architect, Business Analyst, QA Engineer, Admin, Consultant, etc.)
+   - Pick your target company (Salesforce, Deloitte, Accenture, PwC, Capgemini, etc.)
 
 **3. Start the Interview 🎤**
    - Click "Start Interview"
@@ -96,7 +95,7 @@ That's it! Everything else installs automatically with `pip install -r requireme
 ## 📁 Project Structure
 
 ```
-interview-tool/
+salesforce-interview-tool/
 ├── app.py                    # The main app
 ├── prompts.py                # System prompts and instructions
 ├── requirements.txt          # Python dependencies
@@ -118,11 +117,11 @@ Found a bug? Have an idea? Feel free to open an issue or submit a pull request!
 
 ## 📄 License
 
-This project is for educational and practice purposes. Feel free to use it to ace your next interview!
+This project is for educational and practice purposes. Feel free to use it to ace your next Salesforce interview!
 
 ## ✍️ Author
 
 **Vitaliy Arkhanhelski**
 
-Happy interviewing! 🎉 Good luck with your job search! 💼
+Happy interviewing! ☁️ Good luck with your Salesforce career! 💼
 
