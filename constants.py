@@ -121,7 +121,8 @@ ERROR_GENERIC = "❌ **Error:**"
 # ============================================================================
 
 CHAT_INPUT_MAX_CHARS = 1000
-AVATAR_INTERVIEWER = "👔"
+AVATAR_INTERVIEWER = "☁️"  # Salesforce cloud for interviewer
+AVATAR_USER = "🧑‍💼"  # Professional person for candidate
 
 
 # ============================================================================

@@ -84,7 +84,7 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
 
     for message in st.session_state.messages:
         if message["role"] != "system":
-            avatar = AVATAR_INTERVIEWER if message["role"] == "assistant" else None
+            avatar = AVATAR_INTERVIEWER if message["role"] == "assistant" else AVATAR_USER
             with st.chat_message(message["role"], avatar=avatar):
                 st.markdown(message["content"])
 
@@ -93,7 +93,7 @@ if st.session_state.setup_complete and not st.session_state.feedback_shown and n
         if prompt := st.chat_input(PLACEHOLDER_CHAT_INPUT, max_chars=CHAT_INPUT_MAX_CHARS):
             st.session_state.messages.append({"role": "user", "content": prompt})
 
-            with st.chat_message("user"):
+            with st.chat_message("user", avatar=AVATAR_USER):
                 st.markdown(prompt)
 
             if st.session_state.user_message_count < MAX_QUESTIONS - 1:
