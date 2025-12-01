@@ -1,3 +1,36 @@
+"""
+Salesforce Interview Practice Tool - Main Application
+
+This Streamlit application provides an AI-powered interactive interview practice platform
+for Salesforce professionals. Users can simulate realistic job interviews with an AI HR
+interviewer powered by Google Gemini 2.5 Flash.
+
+Features:
+    - Personalized interview setup (name, experience, skills, position, company)
+    - Real-time streaming AI responses for natural conversation flow
+    - Support for multiple Salesforce roles (Developer, Architect, Admin, QA, etc.)
+    - Multiple target companies (Salesforce, Deloitte, Accenture, PwC, etc.)
+    - Configurable interview length (default: 5 questions)
+    - Detailed performance feedback with scoring (1-10 scale)
+    - Beautiful Salesforce-themed UI with custom styling
+    - Error handling for API availability issues
+    - Session state management for seamless user experience
+
+Workflow:
+    1. User provides personal information and selects position/company
+    2. AI conducts interview with role-appropriate questions
+    3. User provides responses through chat interface
+    4. After completion, user can request detailed feedback
+    5. User can restart and practice unlimited times
+
+Dependencies:
+    - google-genai: For Google Gemini API integration
+    - streamlit: For web application framework
+    - streamlit-js-eval: For page reload functionality
+
+Author: Vitaliy Arkhanhelski
+"""
+
 from google import genai
 
 import streamlit as st

@@ -9,6 +9,7 @@ Perfect your Salesforce interview skills with an AI-powered HR interviewer! Get 
 - 🏢 **Pick Your Company** - Salesforce, Deloitte, Accenture, PwC, Capgemini, and leading Salesforce partners
 - 🤖 **Talk to an AI Interviewer** - Get realistic interview questions based on your background
 - ⚡ **Real-Time Streaming Responses** - Watch AI responses appear word-by-word like ChatGPT
+- 🎨 **Beautiful Salesforce-Themed UI** - Enjoy a modern, polished interface with official Salesforce colors and styling
 - 📊 **Get Scored & Reviewed** - Receive a score out of 10 plus detailed feedback
 - 🔄 **Practice Unlimited Times** - Keep practicing until you nail it!
 
@@ -16,8 +17,8 @@ Perfect your Salesforce interview skills with an AI-powered HR interviewer! Get 
 
 ### Step 1: Get the Code
 ```bash
-git clone https://github.com/vitaliyarkhanhelski/salesforce-interview-tool.git
-cd salesforce-interview-tool
+git clone https://github.com/vitaliyarkhanhelski/interview-tool.git
+cd prototype_sf_agent
 ```
 
 ### Step 2: Set Up Python Environment
@@ -95,9 +96,12 @@ That's it! Everything else installs automatically with `pip install -r requireme
 ## 📁 Project Structure
 
 ```
-salesforce-interview-tool/
-├── app.py                    # The main app
+prototype_sf_agent/
+├── app.py                    # The main application
 ├── prompts.py                # System prompts and instructions
+├── constants.py              # Configuration and constants
+├── ui_components.py          # Reusable UI components
+├── styles.css                # Custom Salesforce-themed styling
 ├── requirements.txt          # Python dependencies
 ├── .streamlit/
 │   └── secrets.toml         # Your API key (never shared!)
